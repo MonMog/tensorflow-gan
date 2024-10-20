@@ -1,2 +1,17 @@
 # GAN
-Might be one of my favorite projects so far, its a GAN that I have used to generate fake pictures of cats. 
+
+## Installation
+
+-Filler text
+
+## Usage
+
+-Filler text
+
+## Results
+
+-Filler text
+
+## Credit
+
+Thanks to https://github.com/TrojanPinata for providing the data set of 64x64 cat faces
