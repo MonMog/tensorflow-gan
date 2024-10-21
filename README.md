@@ -29,16 +29,21 @@ Please comment out the following lines if you are unable to use your GPU: lines 
 
 Now that you have the required tools to run the program (or plan on running it off the CPU), here is how you can set up the program.
 
-1. Change the parameters:
-    - You will need to change the parameter in line 22: cat_image_directory. Change this to where your dataset is located
-    - You will need to change the parameter in line 23: SavedFolder. Change this to where you want your output pictures to be saved.
+Required parameters to change before using:
+- Line 22: cat_image_directory. Change this to where your dataset is located
+- Line 23: SavedFolder. Change this to where you want your output pictures to be saved.
 
-    **optional**:
-    You can change the parameter in line 21: image_size. This changes the resoulation of the generated files
-
-2. You're all set up to run the program now.
+  After changing these required parameters, you're all set up to run the program:
     - If you have it in pycharm, you can simply just run the code
     - If you want to run it using command prompt, navigate to the file directory with the python file and type "python main.py"
+
+Optional parameters to change based off preference:
+- Line 18: num_epochs. The number of epochs you will train the model for
+- Line 21: image_size. This changes the resoulation of the generated files
+- Line 94: 25. This number is how often you want the training model to save the files generated.
+- Line 101: examples, rows, cols. These arugments change how the output files are viewed. Examples changes how many photos are generated per epoch displayed. Rows is how many rows are displayed in the plot. Cols is the same as previously mentioned. 
+- Line 129: cat_generator. The name of the saved model.
+
 
 ## Results
 
