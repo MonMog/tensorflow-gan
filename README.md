@@ -10,13 +10,13 @@ Please comment out the following lines if you are unable to use your GPU: lines 
 
     Once you figure out your CC (Compute Capability) for your GPU, you can reference this chart in this post: [Stackoverflow question](https://stackoverflow.com/questions/28932864/which-compute-capability-is-supported-by-which-cuda-versions)
     
-    -After you know which one you need to download, visit this site to see what versions are going to be compatible: [Tensorflow website](https://www.tensorflow.org/install/source#gpu)
+    - After you know which one you need to download, visit this site to see what versions are going to be compatible: [Tensorflow website](https://www.tensorflow.org/install/source#gpu)
         
-    -Tensorflow version downloads: [Pypi tensorflow versions](https://pypi.org/project/tensorflow/#history)
+    - Tensorflow version downloads: [Pypi tensorflow versions](https://pypi.org/project/tensorflow/#history)
 
-    -CUDA version downloads: [CUDA downloads](https://developer.nvidia.com/cuda-toolkit-archive)
+    - CUDA version downloads: [CUDA downloads](https://developer.nvidia.com/cuda-toolkit-archive)
 
-    -cuDNN version downloads: [cuDNN downloads](https://developer.nvidia.com/rdp/cudnn-archive)
+    - cuDNN version downloads: [cuDNN downloads](https://developer.nvidia.com/rdp/cudnn-archive)
 
 
     For my case, I am running a 1050 TI, so I am using tensorflow 2.5.2, with CUDA version 11.2 and cudnn version 8.1
@@ -27,7 +27,18 @@ Please comment out the following lines if you are unable to use your GPU: lines 
 
 ## Usage
 
--Filler text
+Now that you have the required tools to run the program (or plan on running it off the CPU), here is how you can set up the program.
+
+1. Change the parameters:
+    - You will need to change the parameter in line 22: cat_image_directory. Change this to where your dataset is located
+    - You will need to change the parameter in line 23: SavedFolder. Change this to where you want your output pictures to be saved.
+
+    **optional**:
+    You can change the parameter in line 21: image_size. This changes the resoulation of the generated files
+
+2. You're all set up to run the program now.
+    - If you have it in pycharm, you can simply just run the code
+    - If you want to run it using command prompt, navigate to the file directory with the python file and type "python main.py"
 
 ## Results
 
