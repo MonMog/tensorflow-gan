@@ -47,6 +47,14 @@ Optional parameters to change based off preference:
 
 ## Results
 
+Using the dataset of 64x64 cat faces and setting batch size to 256 and the image dimension to 64, I was able to produce these results after 350 epochs:
+
+![Amazing](/Results/gan_generated_image_epoch_350.png)
+
+These results are not perfect, but they are definitely heading towards the right direction. Due to my computer's limiations, it would take a while for me to produce more than 500 epochs, even using the GPU. But the longer the program is running, the better the results _should_ turn out.
+
+## How does it work?
+
 -Filler text
 
 ## Credit
