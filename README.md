@@ -33,18 +33,40 @@ Instead of hardcoding the values into the program, you can use command line arug
 
 | Argument               | Description                                                                            | Required | Default |
 |------------------------|----------------------------------------------------------------------------------------|----------|---------|
-| `--cat_image_directory`| Directory path to training data. Required UNLESS using a pre-trained model.            | Yes      | None    |
+| `--cat_image_directory`| Directory path to training data. Required UNLESS using a pre-trained model.            | Depends  | None    |
 | `--saved_folder`       | Directory path where generated images and models will be saved. Always Required.       | Yes      | None    |
-| `--num_epochs`         | Number of epochs for training.                                                         | No       | 501     |
+| `--num_epochs`         | Number of epochs for training.                                                         | No       | 5001    |
 | `--batch_size`         | Batch size for training.                                                               | No       | 256     |
 | `--noise_dim`          | Max range for the random noise generated.                                              | No       | 100     |
 | `--image_size`         | Size of the generated images (for example, 64x64).                                     | No       | 64      |
 | `--save_interval`      | How often (in epochs) the model will save and output images.                           | No       | 5       |
 | `--pretrained_model`   | Directory path to saved model. This will skip the training and just produce an output. | No       | None    |
+| `--amount`             | Number of images to generate from the pre-trained model.                               | No       | 20      |
+
+
+
 
 For example, here is what I would type for it to run:
 
------
+`python main.py --cat_image_directory "D:/Cats" --saved_folder "D:\Programming\Projects\LatestCatsOutput" --num_epochs 1000 --batch_size 128 --save_interval 10 --noise_dim 50 --image_size 32`
+   - This will generate and train a model with the custom values for epochs, batch size, save interval, noise dim and image size.
+    
+Due to having default values, this command also works:
+
+`python main.py --cat_image_directory "D:/Cats" --saved_folder "D:\Programming\Projects\LatestCatsOutput"`
+   - This will generate and train a model with the default values, 501 epochs, 256 batch size, 100 noise dim, 64 image size and 5 save interval.
+
+If you want to load a previously saved model, I would do:
+
+`python main.py --pretrained_model "D:\Programming\Projects\LatestCatsOutput\gan_generator.tf" --saved_folder "D:\Programming\Projects\LatestCatsOutput" --amount 100`
+   - This will load the pre-trained model and generate 100 photos using the model.
+
+NOTE:
+If you're going to load a previously saved model, you need to make sure to specify the same parameters used for making the generator for loading it. That means if you trained a generate with a custom noise_dim, you will need load the pretrained model with the same custom noise_dim. If you do not do this, it will try to load the pretrained model with the default values assigned and you will receive an error:
+
+`python main.py --pretrained_model "D:\Programming\Projects\LatestCatsOutput\gan_generator.tf" --saved_folder "D:\Programming\Projects\LatestCatsOutput" --noise_dim 50 --amount 100`
+
+
 
 ## Results
 
