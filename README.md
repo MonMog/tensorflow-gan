@@ -27,7 +27,24 @@ Please comment out the following lines if you are unable to use your GPU: lines 
 
 ## Usage
 
--- Big things coming, going to change it to utilize command line arugments instead of hardcoding the values
+Instead of hardcoding the values into the program, you can use command line arugments to run it. Below are the list of avaiable arugments:
+
+### Arguments
+
+| Argument               | Description                                                                            | Required | Default |
+|------------------------|----------------------------------------------------------------------------------------|----------|---------|
+| `--cat_image_directory`| Directory path to training data. Required UNLESS using a pre-trained model.            | Yes      | None    |
+| `--saved_folder`       | Directory path where generated images and models will be saved. Always Required.       | Yes      | None    |
+| `--num_epochs`         | Number of epochs for training.                                                         | No       | 501     |
+| `--batch_size`         | Batch size for training.                                                               | No       | 256     |
+| `--noise_dim`          | Max range for the random noise generated.                                              | No       | 100     |
+| `--image_size`         | Size of the generated images (for example, 64x64).                                     | No       | 64      |
+| `--save_interval`      | How often (in epochs) the model will save and output images.                           | No       | 5       |
+| `--pretrained_model`   | Directory path to saved model. This will skip the training and just produce an output. | No       | None    |
+
+For example, here is what I would type for it to run:
+
+-----
 
 ## Results
 
