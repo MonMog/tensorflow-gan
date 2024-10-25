@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from PIL import Image
 import os
+import argparse
 
 # If its not detecting your GPU, you need to download CUDA or just comment all this line out and it will use CPU
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -12,26 +13,13 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-
-# Change all of this as needed
-one = 1
-num_epochs = 20000 + one
-batch_size = 256
-noise_dim = 100
-image_size = 128  # might want to change this depending on how beefy your PC Is
-cat_image_directory = 'D:/Cat/cats/CAT_00'  # yah, change this 100% to where your training data is stored
-SavedFolder = 'SaveItHere08'  # could change it to a directory but if you dont, just makes a folder in the same folder as the program
-
-if not os.path.exists(SavedFolder):
-    os.makedirs(SavedFolder)
-    # ''' just makes the folder if its not already there'''
-
+# end of line if you chose to use your CPU instead
 
 def generate_noise(batch_size, noise_dim):
     return np.random.normal(0, 1, size=(batch_size, noise_dim))
-    # '''random noise is good for making the pictures'''
 
-def build_generator():
+
+def build_generator(noise_dim, image_size):
     generator = tf.keras.Sequential([
         tf.keras.layers.Dense(256, input_dim=noise_dim),
         tf.keras.layers.LeakyReLU(0.2),
@@ -39,9 +27,9 @@ def build_generator():
         tf.keras.layers.Reshape((image_size, image_size, 3))
     ])
     return generator
-    # ''' defining the layers needed, already put in the image_size so just change the variable instead of messing here'''
 
-def build_discriminator():
+
+def build_discriminator(image_size):
     discriminator = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(image_size, image_size, 3)),
         tf.keras.layers.Dense(256),
@@ -49,7 +37,7 @@ def build_discriminator():
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
     return discriminator
-    # need a discriminator, the person detecting the fake images if its legit or not
+
 
 def build_gan(generator, discriminator):
     discriminator.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=0.0002))
@@ -58,10 +46,9 @@ def build_gan(generator, discriminator):
     gan = tf.keras.Sequential([generator, discriminator])
     gan.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=0.0002))
     return gan
-    # need to build it together
 
 
-def load_real_cats(dataset_path):
+def load_real_cats(dataset_path, image_size):
     cat_images = []
     for filename in os.listdir(dataset_path):
         if filename.endswith(".jpg"):
@@ -72,8 +59,9 @@ def load_real_cats(dataset_path):
     cat_images = np.array(cat_images)
     cat_images = (cat_images.astype(np.float32) - 127.5) / 127.5
     return cat_images
-    # some dumb data processing so it can load the images and train them
-def train_gan(generator, discriminator, gan, X_train, num_epochs, batch_size, noise_dim):
+
+
+def train_gan(generator, discriminator, gan, X_train, num_epochs, batch_size, noise_dim, save_interval, saved_folder):
     for epoch in range(num_epochs):
         for _ in range(X_train.shape[0] // batch_size):
             real_cats = X_train[np.random.randint(0, X_train.shape[0], batch_size)]
@@ -91,40 +79,78 @@ def train_gan(generator, discriminator, gan, X_train, num_epochs, batch_size, no
 
         print(f"Epoch {epoch}/{num_epochs}, D Loss: {discriminator_loss}, G Loss: {generator_loss}")
 
-        if epoch % 25 == 0:
-            save_generated_images(generator, epoch)
+        if epoch % save_interval == 0:
+            save_generated_images(generator,noise_dim, epoch, saved_folder)
+            generator.save(os.path.join(saved_folder, 'gan_generator.tf'),
+                           overwrite=True,
+                           include_optimizer=True,
+                           save_format='tf')
 
-    # really wish I could explain whats going on here, something something making the discriminator know whats a real imainge
-    # and whats a fake imainge so when its training on the dataset, it can sort through it and allow the real photos to go
-    # and ban the fake photos
-
-def save_generated_images(generator, epoch, examples=20, rows=2, cols=10, figsize=(10, 4)):
-    ## you can change the parameters in this function to how many pictures you want to loan and row and col for it
+def save_generated_images(generator,noise_dim, epoch, saved_folder, examples=20, rows=2, cols=10, figsize=(10, 4)):
     noise = generate_noise(examples, noise_dim)
     generated_images = generator.predict(noise)
-    generated_images = 0.5 * generated_images + 0.5  # Rescale to [0, 1]
+    generated_images = 0.5 * generated_images + 0.5
 
     plt.figure(figsize=figsize)
     for i in range(examples):
         plt.subplot(rows, cols, i + 1)
-        plt.imshow(generated_images[i, :, :, :], cmap='jet')  # You can change the cmap as needed
+        plt.imshow(generated_images[i, :, :, :], cmap='jet')
         plt.axis('off')
     plt.tight_layout()
 
-    image_filename = os.path.join(SavedFolder, f'gan_generated_image_epoch_{epoch}.png')
+    image_filename = os.path.join(saved_folder, f'gan_generated_image_epoch_{epoch}.png')
     plt.savefig(image_filename)
 
+
+def save_individual_generated_images(generator, noise_dim, amount, saved_folder):
+    for i in range(amount):
+        noise = generate_noise(1, noise_dim)
+        generated_image = generator.predict(noise)
+        generated_image = 0.5 * generated_image + 0.5
+
+        image_filename = os.path.join(saved_folder, f'generated_image_{i + 1}.png')
+        plt.imsave(image_filename, generated_image[0])
+
+
 if __name__ == '__main__':
-    X_train = load_real_cats(cat_image_directory)
+    parser = argparse.ArgumentParser(description='Train or generate images using GAN')
 
-    # Build the generator, discriminator, and GAN
-    generator = build_generator()
-    discriminator = build_discriminator()
-    gan = build_gan(generator, discriminator)
+    parser.add_argument('--saved_folder', type=str, help='Directory path where generated images and models will be saved. Always Required. ', required=True)
+    parser.add_argument('--pretrained_model', type=str, help=' Directory path to saved model. This will skip the training and just produce an output.', default=None)
+    parser.add_argument('--amount', type=int, help='Number of images to generate from the pre-trained model.', default=20)
+    parser.add_argument('--cat_image_directory', type=str, help='Directory path to training data. Required if not using a pre-trained model.', default=None)
+    parser.add_argument('--num_epochs', type=int, help='Number of epochs to train', default=5001)
+    parser.add_argument('--batch_size', type=int, help='Batch size for training', default=256)
+    parser.add_argument('--noise_dim', type=int, help='Max range for the random noise generated. ', default=100)
+    parser.add_argument('--image_size', type=int, help='Size of the generated images (for example, 64x64).', default=64)
+    parser.add_argument('--save_interval', type=int, help='How often (in epochs) the model will save and output images.', default=5)
 
-    # Train the GAN
-    train_gan(generator, discriminator, gan, X_train, num_epochs, batch_size, noise_dim)
+    args = parser.parse_args()
 
-    # Save the generator model
-    generator.save('cat_generator.h5')
-    # No idear what a h5 file is, but probably something useful?
+    if args.pretrained_model:
+        if not os.path.exists(args.pretrained_model):
+            print(f"Error: Pre-trained model '{args.pretrained_model}' does not exist.")
+            exit(1)
+        generator = tf.keras.models.load_model(args.pretrained_model)
+        save_individual_generated_images(generator, args.noise_dim, args.amount, args.saved_folder)
+        print("Completed generating files using pretrained model.")
+
+    else:
+        if not args.cat_image_directory:
+            print("Error: The --cat_image_directory argument is required when not using a pre-trained model.")
+            exit(1)
+
+        if not os.path.exists(args.cat_image_directory):
+            print(f"Error: The specified cat image directory '{args.cat_image_directory}' does not exist.")
+            exit(1)
+
+        X_train = load_real_cats(args.cat_image_directory, args.image_size)
+
+        generator = build_generator(args.noise_dim, args.image_size)
+        discriminator = build_discriminator(args.image_size)
+        gan = build_gan(generator, discriminator)
+
+        train_gan(generator, discriminator, gan, X_train, args.num_epochs, args.batch_size, args.noise_dim,
+                  args.save_interval, args.saved_folder)
+
+        generator.save(os.path.join(args.saved_folder, 'final_cat_generator.h5'))
