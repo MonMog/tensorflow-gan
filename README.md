@@ -80,7 +80,13 @@ These results are not perfect, but they are definitely heading towards the right
 
 ## How does it work?
 
--Filler text
+I am going to _attempt_ an explaination on how GAN works
+
+There are two major componets in a GAN, the discrimator and the generator. The generators job is to produce images that can "fool" the discrimator and get pass it. The discrimators job is to block any images that don't match the dataset, as in, judge the work of the generator. The discrimator and the generator are two different neural networks that are constantly trying to one-up each other. The generator's goal is to keep improving its output until it gets accepted by the discrimator. The discrimator's goal is to only allow images that belong with the rest of the dataset. 
+
+### Building the generator
+-Filler test
+
 
 ## Credit
 
