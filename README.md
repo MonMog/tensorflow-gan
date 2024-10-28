@@ -84,13 +84,13 @@ These results are not perfect, but they are definitely heading towards the right
 
 I am going to _attempt_ an explaination on how GAN works
 
-There are two major componets in a GAN, the discrimator and the generator. The generators job is to produce images that can "fool" the discrimator and get pass it. The discrimators job is to block any images that don't match the dataset, as in, judge the work of the generator. The discrimator and the generator are two different neural networks that are constantly trying to one-up each other. The generator's goal is to keep improving its output until it gets accepted by the discrimator. The discrimator's goal is to only allow images that belong with the rest of the dataset. 
+There are two major componets in a GAN, the discriminator and the generator. The generators job is to produce images that can "fool" the discrimator and get pass it. The discrimators job is to block any images that don't match the dataset, as in, judge the work of the generator. The discrimator and the generator are two different neural networks that are constantly trying to one-up each other. The generator's goal is to keep improving its output until it gets accepted by the discrimator. The discrimator's goal is to only allow images that belong with the rest of the dataset. 
 
 ### Building the generator
 
 Since we just mentioned that a GAN is two neural networks that are competing with each other, we first need to make the neural network for the generator. The generator takes in random noise, called Z, and tries to mimic an image from the real data set. That is a basic overview of what the generator does so lets use tensorflow to build the generator:
-     - In order to build a simple neural network or model, we would need to use `tf.keras.Sequential`. What this does is takes layers as an input, in order, and then returns a model using the layers created. 
-     - Next, we need to determine what type of layer we will be using.
+ - In order to build a simple neural network or model, we would need to use `tf.keras.Sequential`. What this does is takes layers as an input, in order, and then returns a model using the layers created. 
+ - Next, we need to determine what type of layer we will be using.
 
 
 ## Credit
