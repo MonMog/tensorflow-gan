@@ -100,6 +100,7 @@ def save_generated_images(generator,noise_dim, epoch, saved_folder, examples=20,
 
     image_filename = os.path.join(saved_folder, f'gan_generated_image_epoch_{epoch}.png')
     plt.savefig(image_filename)
+    plt.close()  # ...
 
 
 def save_individual_generated_images(generator, noise_dim, amount, saved_folder):
