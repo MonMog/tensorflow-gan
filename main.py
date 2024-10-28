@@ -19,9 +19,9 @@ def generate_noise(batch_size, noise_dim):
     return np.random.normal(0, 1, size=(batch_size, noise_dim))
 
 
-def build_generator(noise_dim, image_size):
+def build_generator(noise_dim, image_size, neuron_gen):
     generator = tf.keras.Sequential([
-        tf.keras.layers.Dense(256, input_dim=noise_dim),
+        tf.keras.layers.Dense(neuron_gen, input_dim=noise_dim),
         tf.keras.layers.LeakyReLU(0.2),
         tf.keras.layers.Dense(image_size * image_size * 3, activation='tanh'),
         tf.keras.layers.Reshape((image_size, image_size, 3))
@@ -29,10 +29,10 @@ def build_generator(noise_dim, image_size):
     return generator
 
 
-def build_discriminator(image_size):
+def build_discriminator(image_size, neuron_dis):
     discriminator = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(image_size, image_size, 3)),
-        tf.keras.layers.Dense(256),
+        tf.keras.layers.Dense(neuron_dis),
         tf.keras.layers.LeakyReLU(0.2),
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
@@ -112,45 +112,53 @@ def save_individual_generated_images(generator, noise_dim, amount, saved_folder)
         plt.imsave(image_filename, generated_image[0])
 
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train or generate images using GAN')
 
-    parser.add_argument('--saved_folder', type=str, help='Directory path where generated images and models will be saved. Always Required. ', required=True)
-    parser.add_argument('--pretrained_model', type=str, help=' Directory path to saved model. This will skip the training and just produce an output.', default=None)
-    parser.add_argument('--amount', type=int, help='Number of images to generate from the pre-trained model.', default=20)
-    parser.add_argument('--cat_image_directory', type=str, help='Directory path to training data. Required if not using a pre-trained model.', default=None)
-    parser.add_argument('--num_epochs', type=int, help='Number of epochs to train', default=5001)
-    parser.add_argument('--batch_size', type=int, help='Batch size for training', default=256)
-    parser.add_argument('--noise_dim', type=int, help='Max range for the random noise generated. ', default=100)
-    parser.add_argument('--image_size', type=int, help='Size of the generated images (for example, 64x64).', default=64)
-    parser.add_argument('--save_interval', type=int, help='How often (in epochs) the model will save and output images.', default=5)
+    parser.add_argument('--f', type=str, help='Directory path where generated images and models will be saved. Always Required. ', required=True)
+    parser.add_argument('--p', type=str, help=' Directory path to saved model. This will skip the training and just produce an output.', default=None)
+    parser.add_argument('--a', type=int, help='Number of images to generate from the pre-trained model.', default=20)
+    parser.add_argument('--d', type=str, help='Directory path to training data. Required if not using a pre-trained model.', default=None)
+    parser.add_argument('--e', type=int, help='Number of epochs to train', default=5001)
+    parser.add_argument('--b', type=int, help='Batch size for training', default=256)
+    parser.add_argument('--n', type=int, help='Max range for the random noise generated. ', default=100)
+    parser.add_argument('--i', type=int, help='Size of the generated images (for example, 64x64).', default=64)
+    parser.add_argument('--s', type=int, help='How often (in epochs) the model will save and output images.', default=5)
+    parser.add_argument('--ng', type=int, help="How many neurons to start in the first layer for the generator.", default=256)
+    parser.add_argument('--nd', type=int, help="How many neurons to start in the first layer for the discriminator.", default=256)
+
+
 
     args = parser.parse_args()
 
-    if args.pretrained_model:
-        if not os.path.exists(args.pretrained_model):
-            print(f"Error: Pre-trained model '{args.pretrained_model}' does not exist.")
+    if args.p:
+        if not os.path.exists(args.p):
+            print(f"Error: Pre-trained model '{args.p}' does not exist.")
             exit(1)
-        generator = tf.keras.models.load_model(args.pretrained_model)
-        save_individual_generated_images(generator, args.noise_dim, args.amount, args.saved_folder)
+        generator = tf.keras.models.load_model(args.p)
+        save_individual_generated_images(generator, args.n, args.a, args.f)
         print("Completed generating files using pretrained model.")
 
     else:
-        if not args.cat_image_directory:
-            print("Error: The --cat_image_directory argument is required when not using a pre-trained model.")
+        if not args.d:
+            print("Error: The --d argument is required when not using a pre-trained model.")
             exit(1)
 
-        if not os.path.exists(args.cat_image_directory):
-            print(f"Error: The specified cat image directory '{args.cat_image_directory}' does not exist.")
+        if not os.path.exists(args.d):
+            print(f"Error: The specified cat image directory '{args.d}' does not exist.")
             exit(1)
 
-        X_train = load_real_cats(args.cat_image_directory, args.image_size)
+        X_train = load_real_cats(args.d, args.i)
 
-        generator = build_generator(args.noise_dim, args.image_size)
-        discriminator = build_discriminator(args.image_size)
+        generator = build_generator(args.n, args.i, args.ng)
+        discriminator = build_discriminator(args.i, args.nd)
         gan = build_gan(generator, discriminator)
 
-        train_gan(generator, discriminator, gan, X_train, args.num_epochs, args.batch_size, args.noise_dim,
-                  args.save_interval, args.saved_folder)
+        train_gan(generator, discriminator, gan, X_train, args.e, args.b, args.n,
+                  args.s, args.f)
 
-        generator.save(os.path.join(args.saved_folder, 'final_cat_generator.h5'))
+        generator.save(os.path.join(args.f, 'final-generator.tf'),
+                       overwrite=True,
+                       include_optimizer=True,
+                       save_format='tf')
