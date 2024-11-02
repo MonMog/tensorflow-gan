@@ -99,6 +99,15 @@ That concludes the generator. At the end of the function, you may add this line 
 
 ### Building the discriminator
 
+This is the other major half of a GAN, the discriminator. The discriminator's job is to decide if the given input is a real or fake image. The process of building the discriminator is very similiar to building the generator, we will be using the same layers here. 
+ - Same thing for the start of the generator, we will be needing to use `tf.keras.Sequential` to build the model for the discriminator. The first layer of the discriminator is going to be a flatten layer. Currently, our input data is a 3D vector (an image) and we need to flatten it into a 1D. We do this because Dense layers can only take 1D vectors as inputs.
+ - The second layer of the discriminator is going to be the Dense layer. This first Dense layer of the discrimiantor is going to try to learn group of features or patterns within the image to determine if its real or fake. If its going to study the image to tell if its real or fake, shouldn't the amount of neurons in the dense layer be equal to `image_size * image_size * 3` or at least `image_size * image_size`? While I thought this is what we would want to do for the layer, we actually want to have less than `image_size * image_size` neurons in this dense layer. This is because, as previosuly mentioned, this layer is trying to learn patterns within the image. If we give it a smaller amount of neurons to start with, its going to be forced to generalize the image and attempt to pick up on features and look at group of pixels as a whole. If we do this, it should make the discriminator able to learn patterns (Hopefully of course). At the time of writing this, It has come to me that `tf.keras.layers.Dense(neuron_dis)` isn't exactly the best amount of neurons to have in the layer since it actually should be dependent on the image_size. I believe that a good range would be 4% - 16% of `image_size * image_size * 3`. So if you're using image_size = 64, you would want around the range of 4% - 16% of 12,288 to be your first dense layer for the discriminator. After the dense layer, we are going to add a LeakyReLU layer like we previosuly did in the generator. After this layer, some might choose to add `tf.keras.layers.Dropout(0.4)` but when I tested it, the results were as favorable.
+ - The final layer is going to be `tf.keras.layers.Dense(1, activation='sigmoid')`. Since the discriminator is trying to output if the image is real or fake, we need a way for it to inform us. We can do this by giving it a single neuron and then giving it an activation function of sigmoid. This way the range is from 0-1, with 0 being fake and 1 being real.
+
+### Building the GAN together
+
+ - Filler text
+
 
 
 
